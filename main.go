@@ -14,7 +14,7 @@ func main() {
 		currencyValue := currencyValue()
 		targetCurrency := getTargetCurrency(initialCurrency)
 		calculateCurrency := calculateCurrency(initialCurrency, currencyValue, targetCurrency)
-		currencyOutput(calculateCurrency)
+		currencyOutput(calculateCurrency, targetCurrency)
 
 		fmt.Println("Хотите продолжить? (y/n)")
 		var continueInput string
@@ -30,114 +30,112 @@ func main() {
 func getInitialCurrency() int {
 	var currency int
 
-	fmt.Println("Выберете вашу валюту: ")
-	fmt.Println("1. Рубли")
-	fmt.Println("2. Евро")
-	fmt.Println("3. Доллары")
-	fmt.Scanln(&currency)
+	for {
+		fmt.Println("Выберете вашу валюту: ")
+		fmt.Println("1. Рубли")
+		fmt.Println("2. Евро")
+		fmt.Println("3. Доллары")
+		fmt.Scanln(&currency)
 
-	if currency > 0 && currency < 4 {
-		return currency
-	} else {
+		if currency > 0 && currency < 4 {
+			return currency
+		}
 		fmt.Println("Введите корректный номер валюты")
-		return getInitialCurrency()
 	}
 }
 
-func currencyValue() int {
-	var currencyDigit int
+func currencyValue() float64 {
+	var currencyDigit float64
 
-	fmt.Println("Введите сумму валюты: ")
-	fmt.Scanln(&currencyDigit)
+	for {
+		fmt.Println("Введите сумму валюты: ")
+		fmt.Scanln(&currencyDigit)
 
-	switch {
-	case currencyDigit <= 0:
-		{
-			fmt.Println("Введите корректную сумму больше нуля")
-			return currencyValue()
-		}
-
-	case currencyDigit > 0:
-		{
+		if currencyDigit > 0 {
 			return currencyDigit
 		}
+		fmt.Println("Введите корректную сумму больше нуля")
 	}
-
-	return currencyDigit
 }
 
 func getTargetCurrency(initialCurrency int) int {
 	var targetCurrency int
 
-	fmt.Println("Выберете валюту, в которую хотите перевести: ")
+	for {
+		fmt.Println("Выберете валюту, в которую хотите перевести: ")
 
-	switch initialCurrency {
-	case 1:
-		fmt.Println("1. Евро")
-		fmt.Println("2. Доллары")
-	case 2:
-		fmt.Println("1. Рубли")
-		fmt.Println("2. Доллары")
-	case 3:
-		fmt.Println("1. Рубли")
-		fmt.Println("2. Евро")
-	}
+		switch initialCurrency {
+		case 1:
+			fmt.Println("1. Евро")
+			fmt.Println("2. Доллары")
+		case 2:
+			fmt.Println("1. Рубли")
+			fmt.Println("2. Доллары")
+		case 3:
+			fmt.Println("1. Рубли")
+			fmt.Println("2. Евро")
+		}
 
-	fmt.Scanln(&targetCurrency)
+		fmt.Scanln(&targetCurrency)
 
-	if targetCurrency < 1 || targetCurrency > 2 {
+		if targetCurrency >= 1 && targetCurrency <= 2 {
+			switch initialCurrency {
+			case 1: // Из рублей
+				if targetCurrency == 1 {
+					return 2 // Евро
+				}
+				return 3 // Доллары
+			case 2: // Из евро
+				if targetCurrency == 1 {
+					return 1 // Рубли
+				}
+				return 3 // Доллары
+			case 3: // Из долларов
+				if targetCurrency == 1 {
+					return 1 // Рубли
+				}
+				return 2 // Евро
+			}
+		}
 		fmt.Println("Выберите корректный номер валюты (1-2)")
-		return getTargetCurrency(initialCurrency)
 	}
-
-	switch initialCurrency {
-	case 1: // Из рублей
-		if targetCurrency == 1 {
-			return 2 // Евро
-		}
-		return 3 // Доллары
-	case 2: // Из евро
-		if targetCurrency == 1 {
-			return 1 // Рубли
-		}
-		return 3 // Доллары
-	case 3: // Из долларов
-		if targetCurrency == 1 {
-			return 1 // Рубли
-		}
-		return 2 // Евро
-	}
-
-	return targetCurrency
 }
 
-func calculateCurrency(initialCurrency int, currencyValue int, targetCurrency int) float64 {
+func calculateCurrency(initialCurrency int, currencyValue float64, targetCurrency int) float64 {
 	switch initialCurrency {
 	case 1: // Из рублей
 		switch targetCurrency {
 		case 2: // в евро
-			return float64(currencyValue) / eurToRub
+			return currencyValue / eurToRub
 		case 3: // в доллары
-			return float64(currencyValue) / usdToRub
+			return currencyValue / usdToRub
 		}
 	case 2: // Из евро
 		switch targetCurrency {
 		case 1: // в рубли
-			return float64(currencyValue) * eurToRub
+			return currencyValue * eurToRub
 		case 3: // в доллары
-			return float64(currencyValue) / usdToEur
+			return currencyValue / usdToEur
 		}
 	case 3: // Из долларов
 		switch targetCurrency {
 		case 1: // в рубли
-			return float64(currencyValue) * usdToRub
+			return currencyValue * usdToRub
 		case 2: // в евро
-			return float64(currencyValue) * usdToEur
+			return currencyValue * usdToEur
 		}
 	}
 	return 0
 }
 
-func currencyOutput(calculateCurrency float64) {
-	fmt.Printf("Результат: %.2f\n", calculateCurrency)
+func currencyOutput(calculateCurrency float64, targetCurrency int) {
+
+	switch targetCurrency {
+	case 1:
+		fmt.Printf("Результат: %.2f рублей\n", calculateCurrency)
+	case 2:
+		fmt.Printf("Результат: %.2f евро\n", calculateCurrency)
+	case 3:
+		fmt.Printf("Результат: %.2f долларов\n", calculateCurrency)
+	}
 }
