@@ -18,7 +18,7 @@ func main() {
 		to := getCurrency("Целевая валюта (rub/usd/eur): ")
 		amount := getAmount()
 
-		result := convert(from, to, amount)
+		result := convert(from, to, &amount)
 		fmt.Printf("Результат: %.2f %s\n", result, to)
 
 		fmt.Println("Хотите продолжить? (y/n)")
@@ -55,9 +55,9 @@ func getAmount() float64 {
 	}
 }
 
-func convert(from, to string, amount float64) float64 {
+func convert(from, to string, amount *float64) float64 {
 	fromRate := currencyRates[from]
 	toRate := currencyRates[to]
 
-	return amount * (fromRate / toRate)
+	return *amount * (fromRate / toRate)
 }
